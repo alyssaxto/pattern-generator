@@ -1,0 +1,160 @@
+import random
+import pygame
+
+class PatternGenerator:
+    def __init__(self, screen_res, initial_shape="circle"):
+        self.screen_res = screen_res
+        self.size = 16
+        self.birth_rate = 1
+        self.patterns = []
+        self.initial_shape = initial_shape
+
+    def update(self, dt, color):
+        self._generate_new_patterns(color)
+        self._update_patterns(dt)
+
+    def _update_patterns(self, dt):
+        for idx, pattern in enumerate(self.patterns):
+            pattern.update(dt)
+            if self._pattern_is_offscreen(pattern):
+                del self.patterns[idx]
+
+    def _pattern_is_offscreen(self, pattern):
+        tail_is_offscreen = pattern.patterns[-1].pos[1] > self.screen_res[1]
+        return tail_is_offscreen
+
+    def _generate_new_patterns(self, color):
+        screen_width = self.screen_res[0]
+        screen_height = self.screen_res[1]
+        x = random.randrange(0, screen_width - self.size)
+        y = random.randrange(0, screen_height - self.size)
+        pos = (x, y)
+        life = random.randrange(500, 3000)
+        pattern = PatternTrail(pos, self.size, life, self.screen_res, color=color, initial_shape=self.initial_shape)
+        self.patterns.insert(0, pattern)
+
+    def draw(self, surface):
+        for pattern in self.patterns:
+            pattern.draw(surface)
+
+class Pattern:
+    def __init__(self, pos=(0, 0), size=15, life=1000, is_leading=False, shape="circle", color=(255, 192, 203)):
+        self.pos = pos
+        self.size = size
+        self.color = pygame.Color(*color)
+        self.age = 0
+        self.life = life
+        self.dead = False
+        self.alpha = 255
+        self.is_leading = is_leading
+        self.shape = shape
+        self.surface = self.update_surface()
+
+    def update(self, dt):
+        self.age += dt
+        if self.age > self.life:
+            self.dead = True
+        self.alpha = 255 * (1 - (self.life / 1000))
+
+    def update_surface(self):
+        if self.shape == "circle":
+            surf = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+            pygame.draw.ellipse(surf, self.color, surf.get_rect())
+        elif self.shape == "triangle":
+            surf = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+            pygame.draw.polygon(surf, self.color, [(self.size // 2, 0), (0, self.size), (self.size, self.size)])
+        elif self.shape == "square":
+            surf = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+            pygame.draw.rect(surf, self.color, surf.get_rect())
+        else:
+            raise ValueError("Invalid shape")
+
+        return surf
+
+    def draw(self, surface):
+        if self.dead:
+            return
+        self.surface.set_alpha(self.alpha)
+        surface.blit(self.surface, self.pos)
+
+class PatternTrail:
+    def __init__(self, pos, size, life, screen_res, color=(255, 192, 203), initial_shape="circle"):
+        self.pos = pos
+        self.size = size
+        self.life = life
+        self.patterns = []
+        self.screen_res = screen_res
+        self.color = color
+        self.initial_shape = initial_shape
+
+    def update(self, dt):
+        is_leading = True
+        x = random.randrange(0, self.screen_res[0] - self.size)
+        y = random.randrange(0, self.screen_res[1] - self.size)
+        pos = (x, y)
+        pattern = Pattern(pos, size=self.size, life=self.life, is_leading=is_leading, shape=self.initial_shape, color=self.color)
+        self.patterns.append(pattern)
+
+        self._update_patterns(dt)
+
+    def _update_patterns(self, dt):
+        for idx, pattern in enumerate(self.patterns):
+            pattern.update(dt)
+            if pattern.dead:
+                del self.patterns[idx]
+
+    def draw(self, surface):
+        for pattern in self.patterns:
+            pattern.draw(surface)
+
+def main():
+    pygame.init()
+    pygame.display.set_caption("Pattern Generator")
+
+    initial_shape = get_valid_shape()
+    color = get_valid_color()
+
+    resolution = (800, 600)
+    clock = pygame.time.Clock()
+    dt = 0
+    screen = pygame.display.set_mode(resolution)
+
+    pattern_generator = PatternGenerator(resolution, initial_shape=initial_shape)
+    running = True
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        pattern_generator.update(dt, color)
+        screen.fill((0, 0, 0))
+        pattern_generator.draw(screen)
+        pygame.display.flip()
+        dt = clock.tick(30) / 1000
+
+    pygame.quit()
+
+def get_valid_shape():
+    while True:
+        shape_input = input("Enter a shape (triangle, circle, or square): ").lower()
+        if shape_input in ["triangle", "circle", "square"]:
+            return shape_input
+        else:
+            print("Invalid input. Please enter either 'triangle', 'circle', or 'square'.")
+
+def get_valid_color():
+    while True:
+        color_input = input("Enter a color (red, green, or blue): ").lower()
+        if color_input in ["red", "green", "blue"]:
+            if color_input == "red":
+                return (255, 0, 0)
+            elif color_input == "green":
+                return (0, 255, 0)
+            elif color_input == "blue":
+                return (0, 0, 255)
+        else:
+            print("Invalid input. Please enter either 'red', 'green', or 'blue'.")
+
+if __name__ == "__main__":
+    main()

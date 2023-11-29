@@ -1,0 +1,33 @@
+# Pattern Generator
+## Repository
+https://github.com/alyssaxto/pattern-generator.git
+
+## Description
+The Pattern Generator program creates colorful and visually appealing patterns. Users can specify the type of patterns (e.g., geometric, random, fractal) and adjust color schemes. The generated patterns can be saved as images.
+## Features
+- Pattern types
+- Provide options for users to choose from different shapes types
+- Color customization
+- Allow users to select color schemes and adjust color palettes.
+- Intensity
+ 
+- Provide a simple slider to control the complexity or density of the patterns.
+## Challenges
+- Designing the function for generating patterns.
+- Designing the function for color customization
+- Designing the function for intensity
+## Outcomes
+Ideal Outcome:
+- program that generates various colorful patterns, providing an artistic and creative tool.
+Minimal Viable Outcome:
+- pattern generator with basic pattern types and color customization.
+## Milestones
+- Week 1
+ 1. Come up with an idea
+ 2. Select pattern generation techniques.
+- Week 2
+ 1. Implement basic pattern generation
+ 2. Add color customization and complexity control.
+- Week N (Final)
+ 1. Add intensity
+ 2. Perform testing, debugging, and submit
