@@ -2,12 +2,13 @@ import random
 import pygame
 
 class PatternGenerator:
-    def __init__(self, screen_res, initial_shape="circle"):
+    def __init__(self, screen_res, initial_shape="circle", intensity=1):
         self.screen_res = screen_res
         self.size = 16
         self.birth_rate = 1
         self.patterns = []
         self.initial_shape = initial_shape
+        self.intensity = intensity
 
     def update(self, dt, color):
         self._generate_new_patterns(color)
@@ -26,12 +27,13 @@ class PatternGenerator:
     def _generate_new_patterns(self, color):
         screen_width = self.screen_res[0]
         screen_height = self.screen_res[1]
-        x = random.randrange(0, screen_width - self.size)
-        y = random.randrange(0, screen_height - self.size)
-        pos = (x, y)
-        life = random.randrange(500, 3000)
-        pattern = PatternTrail(pos, self.size, life, self.screen_res, color=color, initial_shape=self.initial_shape)
-        self.patterns.insert(0, pattern)
+        for _ in range(self.intensity):
+            x = random.randrange(0, screen_width - self.size)
+            y = random.randrange(0, screen_height - self.size)
+            pos = (x, y)
+            life = random.randrange(500, 3000)
+            pattern = PatternTrail(pos, self.size, life, self.screen_res, color=color, initial_shape=self.initial_shape)
+            self.patterns.insert(0, pattern)
 
     def draw(self, surface):
         for pattern in self.patterns:
@@ -113,13 +115,14 @@ def main():
 
     initial_shape = get_valid_shape()
     color = get_valid_color()
+    intensity = get_valid_intensity()
 
     resolution = (800, 600)
     clock = pygame.time.Clock()
     dt = 0
     screen = pygame.display.set_mode(resolution)
 
-    pattern_generator = PatternGenerator(resolution, initial_shape=initial_shape)
+    pattern_generator = PatternGenerator(resolution, initial_shape=initial_shape, intensity=intensity)
     running = True
 
     while running:
@@ -155,6 +158,19 @@ def get_valid_color():
                 return (0, 0, 255)
         else:
             print("Invalid input. Please enter either 'red', 'green', or 'blue'.")
+
+def get_valid_intensity():
+    while True:
+        intensity_input = input("Enter the intensity (low, medium, high): ").lower()
+        if intensity_input in ["low", "medium", "high"]:
+            if intensity_input == "low":
+                return 1
+            elif intensity_input == "medium":
+                return 2
+            elif intensity_input == "high":
+                return 3
+        else:
+            print("Invalid input. Please enter either 'low', 'medium', or 'high'.")
 
 if __name__ == "__main__":
     main()
