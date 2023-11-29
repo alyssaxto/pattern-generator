@@ -50,7 +50,6 @@ class Pattern:
         self.alpha = 255
         self.is_leading = is_leading
         self.shape = shape
-        self.surface = self.update_surface()
 
     def update(self, dt):
         self.age += dt
@@ -58,7 +57,14 @@ class Pattern:
             self.dead = True
         self.alpha = 255 * (1 - (self.life / 1000))
 
-    def update_surface(self):
+    def draw(self, surface):
+        if self.dead:
+            return
+        surf = self._create_surface()
+        surf.set_alpha(self.alpha)
+        surface.blit(surf, self.pos)
+
+    def _create_surface(self):
         if self.shape == "circle":
             surf = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
             pygame.draw.ellipse(surf, self.color, surf.get_rect())
@@ -71,12 +77,6 @@ class Pattern:
         else:
             raise ValueError("Invalid shape")
         return surf
-
-    def draw(self, surface):
-        if self.dead:
-            return
-        self.surface.set_alpha(self.alpha)
-        surface.blit(self.surface, self.pos)
 
 class PatternTrail:
     def __init__(self, pos, size, life, screen_res, color=(255, 192, 203), initial_shape="circle"):
@@ -143,7 +143,7 @@ def get_valid_shape():
         if shape_input in ["triangle", "circle", "square"]:
             return shape_input
         else:
-            print("Invalid input. Please enter either 'triangle', 'circle', or 'square'.")
+            print("Please enter either 'triangle', 'circle', or 'square'.")
 
 def get_valid_color():
     while True:
@@ -156,7 +156,7 @@ def get_valid_color():
             elif color_input == "blue":
                 return (0, 0, 255)
         else:
-            print("Invalid input. Please enter either 'red', 'green', or 'blue'.")
+            print("Please enter either 'red', 'green', or 'blue'.")
 
 def get_valid_intensity():
     while True:
@@ -169,7 +169,7 @@ def get_valid_intensity():
             elif intensity_input == "high":
                 return 3
         else:
-            print("Invalid input. Please enter either 'low', 'medium', or 'high'.")
+            print("Please enter either 'low', 'medium', or 'high'.")
 
 if __name__ == "__main__":
     main()
