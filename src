@@ -70,7 +70,6 @@ class Pattern:
             pygame.draw.rect(surf, self.color, surf.get_rect())
         else:
             raise ValueError("Invalid shape")
-
         return surf
 
     def draw(self, surface):
