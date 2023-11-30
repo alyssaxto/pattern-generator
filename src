@@ -173,3 +173,6 @@ def get_valid_intensity():
 
 if __name__ == "__main__":
     main()
+    initial_shape = get_valid_shape()
+    color = get_valid_color()
+    intensity = get_valid_intensity()
